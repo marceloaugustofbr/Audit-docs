@@ -348,3 +348,42 @@ body.dark-mode .export-backup {
 body.dark-mode .export-backup {
     border-left-color: #ba68c8;
 }
+/* --- ESTILOS PARA O LOADER (SPINNER) --- */
+.loader {
+  border: 3px solid #f3f3f3; /* Cinza claro */
+  border-top: 3px solid #3498db; /* Azul */
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  animation: spin 1s linear infinite;
+  display: inline-block; /* Alterado para se alinhar com o texto */
+}
+
+/* Animação de rotação */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Classe para esconder elementos (pode já existir, mas garanta que está aqui) */
+.hidden {
+  display: none !important;
+}
+
+/* Estilo do botão quando estiver carregando */
+.btn-loading .btn-text {
+  visibility: hidden; /* Esconde o texto original */
+  opacity: 0;
+}
+
+.btn-loading .loader {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Garante que o botão mantenha sua posição relativa */
+.btn {
+    position: relative;
+}

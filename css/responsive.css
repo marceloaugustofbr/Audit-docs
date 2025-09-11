@@ -1,0 +1,21 @@
+/* Estilos para telas de até 768px de largura (tablets e celulares) */
+@media (max-width: 768px) {
+    .header-container {
+        flex-direction: column; /* Coloca o logo, texto e botões um abaixo do outro */
+        text-align: center;
+    }
+
+    .menu {
+        justify-content: center; /* Centraliza os botões do menu */
+    }
+
+    .filters {
+        flex-direction: column; /* Coloca os filtros um abaixo do outro */
+        align-items: stretch;
+    }
+
+    .filter-group {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}

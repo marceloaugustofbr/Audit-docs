@@ -308,7 +308,7 @@ function gerarTabela() {
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>${doc.categoria}</td>
-                <td><span class="document-name" onclick="abrirModalDetalhes('${doc.nome}')">${doc.nome}</span></td>
+                <td><span class="document-name" data-doc-nome="${doc.nome}">${doc.nome}</span></td>
                 <td>
                     <select data-doc-nome="${doc.nome}" class="possui-select">
                         <option value="Sim" ${possui === "Sim" ? 'selected' : ''}>Sim</option>
@@ -321,7 +321,7 @@ function gerarTabela() {
                 </td>
                 <td>${calcularVencimento(possui, data, doc.periodicidade)}</td>
                 <td>
-                    <button class="btn btn-save" data-doc-nome="${doc.nome}" ${isSalvarDisabled ? 'disabled' : ''}>Salvar</button>
+                    <button class="btn btn-save" data-doc-nome="${doc.nome}" ${isSalvarDisabled ? 'disabled' : ''}><span class="btn-text">Salvar</span></button>
                 </td>
             `;
             tbody.appendChild(tr);
@@ -382,18 +382,32 @@ function configurarEventListeners() {
         }
     });
 
-    // Eventos da tabela
-    const tbody = document.getElementById('tabela-docs');
-    
-    tbody.addEventListener('click', async (e) => {
-        const target = e.target;
-        const docNome = target.dataset.docNome;
-        if (!docNome) return;
+    // Eventos da tabela (versão unificada e corrigida)
+const tbody = document.getElementById('tabela-docs');
 
-        if (target.classList.contains('btn-save')) {
-            await salvarDocumento(target, docNome);
+tbody.addEventListener('click', async (e) => {
+    const target = e.target;
+
+    // Ação 1: Clicou no nome do documento para abrir o modal
+    const docNameSpan = target.closest('.document-name');
+    if (docNameSpan) {
+        const docNome = docNameSpan.dataset.docNome;
+        if (docNome) {
+            abrirModalDetalhes(docNome);
         }
-    });
+        return; // Para a execução para não confundir com outros cliques
+    }
+
+    // Ação 2: Clicou no botão de salvar
+    const saveButton = target.closest('.btn-save');
+    if (saveButton) {
+        const docNome = saveButton.dataset.docNome;
+        if (docNome) {
+            await salvarDocumento(saveButton, docNome);
+        }
+        return; // Para a execução
+    }
+});
     
     tbody.addEventListener('change', (e) => {
         const target = e.target;
@@ -457,13 +471,25 @@ async function salvarDocumento(target, docNome) {
     const dataOriginal = registroOriginal?.data || '';
 
     if (possuiAtual === possuiOriginal && dataAtual === dataOriginal) {
-        target.textContent = 'Sem alterações';
-        setTimeout(() => { target.textContent = 'Salvar'; }, 1500);
+        // Usa uma notificação toast para avisar que não há mudanças
+        Toastify({
+            text: "Nenhuma alteração para salvar",
+            duration: 3000,
+            gravity: "bottom", // `top` or `bottom`
+            position: "right", // `left`, `center` or `right`
+            backgroundColor: "#ffa500", // Laranja para aviso
+        }).showToast();
         return;
     }
 
-    target.textContent = 'Salvando...';
+    // --- LÓGICA DO LOADER (INÍCIO) ---
+    const originalText = target.querySelector('.btn-text');
+    const loader = document.createElement('div');
+    loader.className = 'loader';
+
     target.disabled = true;
+    originalText.classList.add('hidden'); // Esconde o texto
+    target.appendChild(loader); // Adiciona o loader
     
     try {
         const dadosParaSalvar = { nome: docNome, operacao: opSelecionada, possui: possuiAtual, data: dataAtual };
@@ -483,18 +509,36 @@ async function salvarDocumento(target, docNome) {
             dadosSalvos.push(dadosParaSalvar);
         }
         
-        target.textContent = 'Salvo!';
-        gerarTabela();
+        gerarTabela(); // Atualiza a tabela para refletir o novo status
+
+        // --- NOTIFICAÇÃO DE SUCESSO ---
+        Toastify({
+            text: "Documento salvo com sucesso!",
+            duration: 3000,
+            gravity: "bottom",
+            position: "right",
+            backgroundColor: "#4caf50", // Verde para sucesso
+        }).showToast();
+
     } catch (error) {
         console.error("Erro ao salvar:", error);
-        alert("Ocorreu um erro ao salvar os dados.");
-        target.textContent = 'Erro!';
+        
+        // --- NOTIFICAÇÃO DE ERRO ---
+        Toastify({
+            text: "Ocorreu um erro ao salvar os dados.",
+            duration: 3000,
+            gravity: "bottom",
+            position: "right",
+            backgroundColor: "#ff4d4d", // Vermelho para erro
+        }).showToast();
+
     } finally {
-        setTimeout(() => {
-            target.textContent = 'Salvar';
-            const isSalvarDisabled = (possuiAtual === 'Sim' && !dataAtual && documentos.find(d => d.nome === docNome).periodicidade !== 'Sempre');
-            target.disabled = isSalvarDisabled;
-        }, 1500);
+        // --- LÓGICA DO LOADER (FIM) ---
+        // Este bloco 'finally' sempre será executado, com sucesso ou erro
+        originalText.classList.remove('hidden'); // Mostra o texto novamente
+        target.removeChild(loader); // Remove o loader
+        const isSalvarDisabled = (possuiAtual === 'Sim' && !dataAtual && documentos.find(d => d.nome === docNome).periodicidade !== 'Sempre');
+        target.disabled = isSalvarDisabled;
     }
 }
 
