@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Controle e Dashboard de Documentos</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" type="image/x-icon" href="dhl.webp">
+<link rel="stylesheet" href="./style/owl/owl.carousel.min.css">
+<link rel="stylesheet" href="./style/owl/owl.theme.default.min.css">
+<link rel="stylesheet" href="./style/responsive.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+    <link rel="icon" type="image/x-icon" href="/dhlico.ico">
+<div id="loader" style="display: flex; justify-content: center; align-items: center; height: 100vh; font-size: 20px;">Carregando...</div>
+
+<div id="main-container" class="container" style="display: none;">
+    <div class="user-info-container">
+        <span id="user-email-display" class="user-email"></span>
+    </div>
+
+    <div class="header-container">
+        <img src="https://cdn.worldvectorlogo.com/logos/dhl-logo-1.svg" alt="DHL Logo" class="logo">
+        <div class="header-text">
+            <h1>Controle e Dashboard de Documentos</h1>
+            <p>Gestão dos documentos e requisitos legais das operações</p>
+        </div>
+        <div class="header-actions">
+            <button id="btn-dark-mode" class="btn">Modo Escuro</button>
+            <button id="logout-btn" class="btn btn-logout">Sair</button>
+        </div>
+    </div>
+
+    <div class="menu">
+        <button id="btn-controle" class="active">Controle de Documentos</button>
+        <button id="btn-dashboard">Dashboard Geral</button>
+        <button id="btn-comparativo">Comparativo por Operação</button>
+        <button id="btn-categoria">Análise por Categoria</button>
+        <button id="btn-cronograma">Cronograma de Vencimentos</button>
+        <button id="btn-pendencias">Apenas Pendências</button>
+    </div>
+
+    <div id="controle">
+        <div class="filters">
+            <div class="filter-group">
+                <label for="operacao">Operação:</label>
+                <select id="operacao">
+                    <option value="">Selecione sua operação</option>
+                    <option value="Mercado Livre - Bauru">Mercado Livre - Bauru</option>
+                    <option value="Mercado Livre - Avaré">Mercado Livre - Avaré</option>
+                    <option value="Mercado Livre - Franca">Mercado Livre - Franca</option>
+                    <option value="Mercado Livre - Barretos">Mercado Livre - Barretos</option>
+                    <option value="Mercado Livre - Marilia">Mercado Livre - Marilia</option>
+                    <option value="Mercado Livre - Cravinhos">Mercado Livre - Cravinhos</option>
+                    <option value="Mercado Livre - Araçatuba">Mercado Livre - Araçatuba</option>
+                    <option value="Mercado Livre - Jales">Mercado Livre - Jales</option>
+                    <option value="Mercado Livre - Rio Preto">Mercado Livre - Rio Preto</option>
+                    <option value="Mercado Livre - Prudente">Mercado Livre - Prudente</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="busca">Buscar:</label>
+                <input type="text" id="busca" placeholder="Nome do documento...">
+            </div>
+            <div class="filter-group">
+                <label for="categoria">Categoria:</label>
+                <select id="categoria">
+                    <option value="">Todas as categorias</option>
+                    <option value="REQUISITOS LEGAIS">REQUISITOS LEGAIS</option>
+                    <option value="REGULÁTORIOS MERCADO LIVRE">REGULÁTORIOS MERCADO LIVRE</option>
+                    <option value="CIPA">CIPA</option>
+                    <option value="BRIGADA">BRIGADA</option>
+                    <option value="SIMULADOS">SIMULADOS</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="status-filter">Status:</label>
+                <select id="status-filter">
+                    <option value="">Todos os status</option>
+                    <option value="Em dia">Em dia</option>
+                    <option value="Vence em breve">Vence em breve</option>
+                    <option value="Vencido">Vencido</option>
+                    <option value="Pendente">Pendente</option>
+                </select>
+            </div>
+        </div>
+        <div class="filtro-atual" id="filtro-atual">Selecione sua operação para começar.</div>
+
+        <div class="summary-stats" id="resumo-status">
+            <div class="stat-item">
+                <div class="stat-number" id="total-docs">0</div>
+                <div class="stat-label">Total de Docs.</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="em-dia-count">0</div>
+                <div class="stat-label">Em Dia</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="vence-breve-count">0</div>
+                <div class="stat-label">Vence Breve</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="vencidos-count">0</div>
+                <div class="stat-label">Vencidos</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="pendentes-count">0</div>
+                <div class="stat-label">Pendentes</div>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th data-sort="categoria">Categoria <span class="sort-icon">↕</span></th>
+                    <th data-sort="nome">Documento <span class="sort-icon">↕</span></th>
+                    <th data-sort="possui">Possui Documento? <span class="sort-icon">↕</span></th>
+                    <th data-sort="status">Status <span class="sort-icon">↕</span></th>
+                    <th data-sort="data">Data do Documento <span class="sort-icon">↕</span></th>
+                    <th data-sort="vencimento">Vencimento <span class="sort-icon">↕</span></th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="tabela-docs"></tbody>
+        </table>
+
+        <div class="export-section">
+            <h3>Exportação e Backup</h3>
+            
+            <div class="export-individual">
+                <button id="btn-export" class="btn btn-export">Exportar CSV (Excel)</button>
+                <button id="btn-pdf" class="btn btn-pdf">Gerar PDF da Operação</button>
+            </div>
+            
+            <div class="export-backup">
+                <button id="export-json-btn" class="btn btn-save">Exportar Backup Completo (JSON)</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="dashboard-page" style="display:none;">
+        <h2>Dashboard Geral de Documentos</h2>
+        <div class="summary-card">
+            <h3>Visão Geral por Status</h3>
+            <div class="summary-stats">
+                <div class="stat-item">
+                    <div class="stat-number" id="dashboard-em-dia">0</div>
+                    <div class="stat-label">Em Dia</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="dashboard-vence-breve">0</div>
+                    <div class="stat-label">Vence Breve</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="dashboard-vencidos">0</div>
+                    <div class="stat-label">Vencidos</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="dashboard-pendentes">0</div>
+                    <div class="stat-label">Pendentes</div>
+                </div>
+            </div>
+        </div>
+        <div class="summary-card">
+            <h3>Distribuição de Status (Geral)</h3>
+            <div class="chart-container">
+                <canvas id="status-chart"></canvas>
+            </div>
+        </div>
+        <div id="dashboard"></div>
+    </div>
+
+    <div id="comparativo-page" style="display:none;">
+        <h2>Comparativo de Status por Operação</h2>
+        <div class="summary-card">
+            <p style="text-align: center; font-style: italic; margin-bottom: 15px;">Clique em um segmento do gráfico para ver os detalhes.</p>
+            <div class="chart-container" style="height: 400px;">
+                <canvas id="comparativo-chart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div id="categoria-page" style="display:none;">
+        <h2>Análise de Status por Categoria</h2>
+        <div class="summary-card">
+            <div class="chart-container" style="height: 400px;">
+                <canvas id="categoria-chart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div id="cronograma-page" style="display:none;">
+        <h2>Cronograma de Vencimentos Futuros</h2>
+        <div id="cronograma-container"></div>
+    </div>
+
+    <div id="pendencias-page" style="display:none;">
+        <h2>Documentos Pendentes</h2>
+        <div id="pendencias"></div>
+    </div>
+
+    <div id="doc-modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+        <div style="background-color: #fefefe; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 600px; border-radius: 8px;">
+            <span id="close-modal" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+            <h2 id="modal-title">Detalhes do Documento</h2>
+            <div id="modal-content"></div>
+            <div class="comment-section">
+                <h4>Comentários</h4>
+                <div id="comments-container"></div>
+                <textarea id="comment-input" class="comment-input" placeholder="Adicione um comentário..."></textarea>
+                <button id="add-comment" class="btn btn-save">Adicionar Comentário</button>
+            </div>
+            <div style="margin-top: 20px;">
+                <button id="view-history" class="btn btn-edit">Ver Histórico de Alterações</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="history-modal" class="history-modal">
+        <div class="history-content">
+            <span class="close-history">&times;</span>
+            <h2>Histórico de Alterações</h2>
+            <div id="history-content-container"></div>
+        </div>
+    </div>
+
+    <div class="footer" style="margin-top: 30px; padding: 15px; text-align: right; border-top: 1px solid #eee; color: #666;">
+        Desenvolvido por <strong>Marcelo Augusto - HSE DHL</strong>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+<script src="js/script.js"></script>
+</body>
+</html>

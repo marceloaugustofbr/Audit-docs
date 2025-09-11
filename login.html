@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Controle de Documentos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="icon" type="image/x-icon" href="dhl.webp">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* Reset e Configurações Globais */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(120deg, #f5f7fa, #e9ecef);
+            color: #333;
+            flex-direction: column;
+        }
+
+        /* Container do Login */
+        .login-container {
+            background: white;
+            padding: 40px 50px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .login-container:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Logo */
+        .logo {
+            width: 150px;
+            margin-bottom: 25px;
+        }
+
+        /* Título */
+        .login-container h2 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .login-container p {
+            margin-bottom: 30px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Grupo de Input com Ícone */
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .input-group::before {
+            font-family: "Font Awesome 5 Free";
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #aaa;
+            font-size: 16px;
+            transition: color 0.3s;
+        }
+
+        #email-group::before {
+            content: '\f007'; /* Ícone de usuário */
+            font-weight: 900;
+        }
+
+        #password-group::before {
+            content: '\f023'; /* Ícone de cadeado */
+            font-weight: 900;
+        }
+        
+        /* Estilo dos Inputs */
+        .login-container input {
+            width: 100%;
+            padding: 12px 15px 12px 45px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .login-container input:focus {
+            outline: none;
+            border-color: #ffcc00;
+            box-shadow: 0 0 0 3px rgba(255, 204, 0, 0.2);
+        }
+
+        .login-container input:focus + .input-group::before {
+            color: #2c3e50;
+        }
+
+        /* Botão de Login */
+        .login-container button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            background-color: #d40511;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            margin-top: 10px;
+        }
+
+        .login-container button:hover {
+            background-color: #b7040f;
+            transform: translateY(-2px);
+        }
+
+        /* Mensagem de Erro */
+        .error-message {
+            color: #d40511;
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+            font-weight: 500;
+        }
+
+        /* Rodapé de confiança */
+        .footer {
+            margin-top: 25px;
+            font-size: 12px;
+            color: #555;
+            text-align: center;
+            max-width: 420px;
+        }
+
+        .footer a {
+            color: #1565c0;
+            text-decoration: none;
+            margin: 0 5px;
+            font-weight: 500;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .trust-message {
+            margin-bottom: 8px;
+            font-style: italic;
+            color: #333;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <div class="login-container">
+        <img src="https://cdn.worldvectorlogo.com/logos/dhl-logo-1.svg" alt="DHL Logo" class="logo">
+        <h2>Acesso ao Sistema</h2>
+        <p>Controle de Documentos</p>
+        <form id="login-form">
+            <div class="input-group" id="email-group">
+                <input type="email" id="email" placeholder="Seu e-mail" required>
+            </div>
+            <div class="input-group" id="password-group">
+                <input type="password" id="password" placeholder="Sua senha" required>
+            </div>
+            <button type="submit">Entrar</button>
+        </form>
+        <p id="error-message" class="error-message"></p>
+    </div>
+
+    <!-- Rodapé de confiança -->
+    <div class="footer">
+        <p class="trust-message">Este sistema é de uso exclusivo interno DHL para gestão de documentos.</p>
+        <a href="sobre.html">Sobre</a> | 
+        <a href="contato.html">Contato</a> | 
+        <a href="politica-privacidade.html">Política de Privacidade</a>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    
+    <script>
+        const firebaseConfig = {
+          apiKey: "AIzaSyAZyYOnifMD_lqs9lJ3nO39RnsrWYvvmwQ",
+          authDomain: "controle-docs-dhl.firebaseapp.com",
+          projectId: "controle-docs-dhl",
+          storageBucket: "controle-docs-dhl.appspot.com",
+          messagingSenderId: "1008887636829",
+          appId: "1:1008887636829:web:ce833a915144733f233eb4"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        const loginForm = document.getElementById('login-form');
+        const errorMessage = document.getElementById('error-message');
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            auth.signInWithEmailAndPassword(email, password)
+                .then(() => {
+                    window.location.href = 'index.html';
+                })
+                .catch(() => {
+                    errorMessage.textContent = 'E-mail ou senha inválidos.';
+                    errorMessage.style.display = 'block';
+                });
+        });
+    </script>
+</body>
+</html>
